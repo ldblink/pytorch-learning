@@ -29,7 +29,7 @@ batch_size = 100
 learning_rate = 0.001
 
 # MNIST data set
-train_date_set = dsets.MNIST(root='../MNIST',
+train_date_set = dsets.MNIST(root='../data/MNIST',
                              train=True,
                              transform=transforms.ToTensor(),
                              download=True)
@@ -37,7 +37,7 @@ train_data_loader = torch.utils.data.DataLoader(dataset=train_date_set,
                                                 shuffle=True,
                                                 batch_size=batch_size)
 
-test_date_set = dsets.MNIST(root='../MNIST',
+test_date_set = dsets.MNIST(root='../data/MNIST',
                             train=False,
                             transform=transforms.ToTensor(),
                             download=True)

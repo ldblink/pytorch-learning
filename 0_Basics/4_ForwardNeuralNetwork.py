@@ -30,12 +30,12 @@ learning_rate = 0.001
 hidden_size = 100
 
 # MNIST data set
-train_data_set = dsets.MNIST(root='../MNIST',
+train_data_set = dsets.MNIST(root='../data/MNIST',
                              train=True,
                              download=False,
                              transform=transforms.ToTensor())
 
-test_data_set = dsets.MNIST(root='../MNIST',
+test_data_set = dsets.MNIST(root='../data/MNIST',
                             train=False,
                             download=False,
                             transform=transforms.ToTensor())
