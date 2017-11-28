@@ -54,53 +54,53 @@ test_loader = torch.utils.data.DataLoader(test_set,
 # RNN
 class RNN(nn.Module):
     """
-   LSTM
-   x: outside data
-   W: weight
-   b: bias
-   c: cell state
-   h: hidden layer data
-   ---------------------------------------------
-   forget gate:
-       output 0~1 scalar(f_t) to decide whether to forget->0/remain->1
+    LSTM
+    x: outside data
+    W: weight
+    b: bias
+    c: cell state
+    h: hidden layer data
+    ---------------------------------------------
+    forget gate:
+        output 0~1 scalar(f_t) to decide whether to forget->0/remain->1
 
-       f_t = sigmoid(W_f . [h_(t-1), x_t] + b_f)
+        f_t = sigmoid(W_f . [h_(t-1), x_t] + b_f)
 
-       or
+        or
 
-       f_t = sigmoid(W_if . x_t + b_if + W_hf . h_(t-1) + b_hf)
+        f_t = sigmoid(W_if . x_t + b_if + W_hf . h_(t-1) + b_hf)
 
-   input gate:
-       output 0~1 scalar(i_t) to decide whether to forget->0/remain->1
+    input gate:
+        output 0~1 scalar(i_t) to decide whether to forget->0/remain->1
 
-       i_t = sigmoid(W_i . [h_(t-1), x_t] + b_i)
+        i_t = sigmoid(W_i . [h_(t-1), x_t] + b_i)
 
-       or
+        or
 
-       i_t = sigmoid(W_ii . x_t + b_ii + W_hi . h_(t-1) + b_hi)
+        i_t = sigmoid(W_ii . x_t + b_ii + W_hi . h_(t-1) + b_hi)
 
-   candidate cell state:
-       this state vector can be added into cell state
+    candidate cell state:
+        this state vector can be added into cell state
 
-       g_t = tanh(W_g . [h_(t-1), x_t] + b_g)
+        g_t = tanh(W_g . [h_(t-1), x_t] + b_g)
 
-       or
+        or
 
-       g_t = tanh(W_ig . x_t + b_ig + W_hc . h_(t-1) + b_hg)
+        g_t = tanh(W_ig . x_t + b_ig + W_hc . h_(t-1) + b_hg)
 
-   update cell state:
-       forget pre-state, remain new state
+    update cell state:
+        forget pre-state, remain new state
 
-       c_t = f_t * c_(t-1) + i_t * g_t
+        c_t = f_t * c_(t-1) + i_t * g_t
 
-   output gate:
-       decide which need to be output
+    output gate:
+        decide which need to be output
 
-       o_t = sigmoid(W_io . x_t + b_io + W_ho . h_(t-1) + b_ho)
+        o_t = sigmoid(W_io . x_t + b_io + W_ho . h_(t-1) + b_ho)
 
-       according the cell state decide the final output
+        according the cell state decide the final output
 
-       h_t = o_t * tanh(c_t)
+        h_t = o_t * tanh(c_t)
 
     PyTorch API: see the doc
     """
