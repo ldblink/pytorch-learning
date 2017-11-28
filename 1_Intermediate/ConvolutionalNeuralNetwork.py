@@ -60,6 +60,7 @@ class CNN(nn.Module):
             nn.Conv2d(16, 32, kernel_size=5, padding=2),
             nn.BatchNorm2d(32),
             nn.ReLU(),
+            # But some experiments show that the performance will be better putting the BN layer after the Activation.
             nn.MaxPool2d(2)
         )
         self.fc = nn.Linear(7 * 7 * 32, 10)  # 28*28 -> 14*14 -> 7*7
@@ -93,7 +94,7 @@ for epoch in range(num_epochs):
                   % (epoch + 1, num_epochs, i + 1, len(train_loader), loss.data[0]))
 
 # test the model
-cnn.eval()
+cnn.eval()  # evaluation mode, only effect Dropout/BatchNorm.
 correct = 0
 total = 0
 for images, labels in test_loader:
