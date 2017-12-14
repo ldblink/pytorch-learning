@@ -89,7 +89,7 @@ class RNN(nn.Module):
         g_t = tanh(W_ig . x_t + b_ig + W_hc . h_(t-1) + b_hg)
 
     update cell state:
-        forget pre-state, remain new state
+        forget pre-state, remain new stateNone
 
         c_t = f_t * c_(t-1) + i_t * g_t
 
@@ -113,21 +113,20 @@ class RNN(nn.Module):
         self.lstm = nn.LSTM(input_size, hidden_size, num_layer, batch_first=True)
         self.fc = nn.Linear(hidden_size, num_class)
 
-    def forward(self, x):
-        # initial hidden state for each element in the batch
-        # num_layers*num_directions, batch, hidden_size
-        h0 = Variable(torch.zeros(self.num_layer, x.size(0), self.hidden_size))
-        # initial cell state for each element in the batch
-        c0 = Variable(torch.zeros(self.num_layer, x.size(0), self.hidden_size))
-
+    def forward(self, x, hidden):
         # forward
         # output, (h_n, c_n) = lstm(x, (h0, c0))
-        # output(seq_len, batch, hidden_size*num_directions)/(batch, seq_len, hidden_size*num_directions):
-        out, _ = self.lstm(x, (h0, c0))
+        # output(seq_len, batch, hidden_size*num_directions)/(batch, seq_len, hidden_size*num_directions)
+        # (h_n, c_n) hidden states
+        out, hidden = self.lstm(x, hidden)
+
+        # THIS STEP IS INTEGRANT !!! ----------------------------------
+        hidden = (Variable(hidden[0].data), Variable(hidden[1].data))
+        # -------------------------------------------------------------
 
         # only take the last batch, meaning the last output is the predicted result
-        out = self.fc(out[:, -1, :])
-        return out
+        out = self.fc(out[:, -1, :])    # (batch, seq_len = -1, hidden_size*num_directions)
+        return out, hidden
 
 
 rnn = RNN(input_size, hidden_size, num_layer, num_class)
@@ -135,6 +134,9 @@ rnn = RNN(input_size, hidden_size, num_layer, num_class)
 # loss & optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(rnn.parameters(), lr=learning_rate)
+
+hidden = (Variable(torch.randn(num_layer, batch_size, hidden_size)),
+          Variable(torch.randn(num_layer, batch_size, hidden_size)))
 
 # train the model
 for epoch in range(num_epochs):
@@ -144,7 +146,7 @@ for epoch in range(num_epochs):
 
         # f + b + o
         optimizer.zero_grad()
-        outputs = rnn.forward(images)
+        outputs, hidden = rnn.forward(images, hidden)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
@@ -160,7 +162,7 @@ total = 0.0
 for images, labels in test_loader:
     images = Variable(images.view(-1, sequence_length, input_size))
     labels = Variable(labels)
-    output = rnn.forward(images)
+    output, hidden = rnn.forward(images, hidden)
     _, labels_pred = torch.max(output.data, 1)
     total += labels.size(0)
     correct += (labels_pred == labels.data).sum()
